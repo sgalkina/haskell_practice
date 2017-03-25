@@ -1,3 +1,5 @@
-double x = x + x
+-- Convert positive Integers to a list of digits
+toDigits :: Integer -> [Integer]
+toDigits x = [x, x]
 
-main = print (double 5)
+main = print (toDigits 1234)
