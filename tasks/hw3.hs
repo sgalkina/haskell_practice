@@ -1,4 +1,5 @@
 --http://www.cis.upenn.edu/~cis194/spring13/hw/03-rec-poly.pdf
+import Data.List
 
 --Take every Nth element from the list
 everyNth :: Int -> [a] -> [a]
@@ -17,8 +18,11 @@ localMaxima (x:y:z:rest)
   | otherwise = localMaxima (y:z:rest)
 localMaxima xs = []
 
--- --Outputs a vertical histogram showing how many of each number
--- --were in the input list
--- histogram :: [Integer] -> String
+--Outputs a vertical histogram showing how many of each number
+--were in the input list
+histogram :: [Integer] -> String
+histogram xs = intercalate "\n" (reverse (transpose b) ++ ["==========", "0123456789"])
+  where a = map length (group (sort (xs ++ [0..9])))
+        b = [(replicate (n - 1) '*') ++ (replicate ((maximum a) - n) ' ') | n <- a]
 
-main = print (localMaxima [2,9,5,6,1])
+main = putStr (histogram [1,4,5,4,6,6,3,4,2,4,9])
