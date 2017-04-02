@@ -4,10 +4,9 @@ import Log
 
 --Helper function for parseMessage
 parseWords :: [String] -> LogMessage
-parseWords (x:number:xs)
-  | x == "E" = LogMessage (Error (read number :: Int)) (read (head xs) :: Int) (unwords (tail xs))
-  | x == "I" = LogMessage Info (read number :: Int) (unwords xs)
-  | x == "W" = LogMessage Warning (read number :: Int) (unwords xs)
+parseWords ("E":number:xs) = LogMessage (Error (read number :: Int)) (read (head xs) :: Int) (unwords (tail xs))
+parseWords ("I":number:xs) = LogMessage Info (read number :: Int) (unwords xs)
+parseWords ("W":number:xs) = LogMessage Warning (read number :: Int) (unwords xs)
 parseWords x = Unknown (unwords x)
 
 --Parses an individual line from the log file
@@ -18,19 +17,22 @@ parseMessage s = parseWords (words s)
 parse :: String -> [LogMessage]
 parse x = map parseMessage (lines x)
 
+--Get time from LogMessage
+time :: LogMessage -> Int
+time (Unknown _) = 0
+time (LogMessage _ t _) = t
+
 --Inserts a new LogMessage into an existing MessageTree, producing a new MessageTree
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) tree = tree
 insert x Leaf = Node Leaf x Leaf
-insert x@(LogMessage _ t _) (Node l m@(LogMessage _ v _) r)
-  | t >= v = Node l m (insert x r)
+insert x (Node l m r)
+  | (time x) >= (time m) = Node l m (insert x r)
   | otherwise = Node (insert x l) m r
-insert _ tree = tree
 
 --Build a complete MessageTree from a list of messages
 build :: [LogMessage] -> MessageTree
-build [] = Leaf
-build (x:xs) = insert x (build xs)
+build = foldr insert Leaf
 
 --Takes a sorted MessageTree and produces a list of all the
 --LogMessages it contains, sorted by timestamp from smallest to biggest
