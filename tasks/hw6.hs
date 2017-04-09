@@ -66,10 +66,10 @@ instance Num (Stream Integer) where
   (*) (Cons x xs) b@(Cons y ys) = Cons (x * y) $ ((fromInteger x) * ys) + (xs * b)
 
 instance Fractional (Stream Integer) where
-    (/) (Cons x xs) b@(Cons y ys) = q where
-        divide a = floor (fromIntegral a / fromIntegral y::Double)
-        coef = floor (fromIntegral x / fromIntegral y::Double)
-        q = Cons coef (streamMap divide (xs - (q * ys)))
+  (/) (Cons x xs) b@(Cons y ys) = q where
+      divide a = floor (fromIntegral a / fromIntegral y::Double)
+      coef = floor (fromIntegral x / fromIntegral y::Double)
+      q = Cons coef (streamMap divide (xs - (q * ys)))
 
 fibs3 :: Stream Integer
 fibs3 = x / (1 - x - x^2)
