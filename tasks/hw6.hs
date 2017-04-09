@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 --Translate the definition of Fibonacci numbers directly into a recursive function definition of type
 fib :: Integer -> Integer
 fib 0 = 0
@@ -46,11 +48,28 @@ nats :: Stream Integer
 nats = streamFromSeed (+1) 0
 
 interleaveStreams :: Stream a -> Stream a -> Stream a
-interleaveStreams (Cons x xs) (Cons y ys) = Cons x $ Cons y $ interleaveStreams xs ys
-
-interleave :: Integer -> Stream Integer
-interleave n = interleaveStreams (streamRepeat n) (interleave (n+1))
+interleaveStreams (Cons x xs) ~(Cons y ys) = Cons x $ Cons y $ interleaveStreams xs ys
 
 --nth element in the stream is the largest power of 2 which evenly divides n.
 ruler :: Stream Integer
-ruler = interleave 0 --wrong! hangs when trying to show
+ruler = foldr1 interleaveStreams $ map streamRepeat [0..]
+
+--Fibonacci numbers via generating functions
+
+x :: Stream Integer
+x = Cons 0 $ Cons 1 $ streamRepeat 0
+
+instance Num (Stream Integer) where
+  fromInteger x = Cons x $ streamRepeat 0
+  negate = streamMap (*(-1))
+  (+) (Cons x xs) (Cons y ys) = Cons (x + y) $ (+) xs ys
+  (*) (Cons x xs) b@(Cons y ys) = Cons (x * y) $ ((fromInteger x) * ys) + (xs * b)
+
+instance Fractional (Stream Integer) where
+    (/) (Cons x xs) b@(Cons y ys) = q where
+        divide a = floor (fromIntegral a / fromIntegral y::Double)
+        coef = floor (fromIntegral x / fromIntegral y::Double)
+        q = Cons coef (streamMap divide (xs - (q * ys)))
+
+fibs3 :: Stream Integer
+fibs3 = x / (1 - x - x^2)
