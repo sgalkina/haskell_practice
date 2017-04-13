@@ -34,6 +34,10 @@ commands = map show [View, Edit, Next, Prev, Quit]
 
 -- Editor monad
 
+instance Applicative (Editor b) where
+  pure = return
+  (<*>) = ap
+
 newtype Editor b a = Editor (StateT (b,Int) IO a)
   deriving (Functor, Monad, MonadIO, MonadState (b,Int))
 
@@ -107,7 +111,7 @@ doCommand Edit = do
   modBuffer $ replaceLine l new
 
 doCommand (Load filename) = do
-  mstr <- io $ handle (\(_ :: IOException) -> 
+  mstr <- io $ handle (\(_ :: IOException) ->
                          putStrLn "File not found." >> return Nothing
                       ) $ do
                  h <- openFile filename ReadMode
