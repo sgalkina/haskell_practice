@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 import Data.Monoid
 import Data.Tree
+import Data.List
+import System.Environment
 import Employee
 
 glCons :: Employee -> GuestList -> GuestList
@@ -24,4 +26,8 @@ nextLevel e gls = (glCons e (foldr1 (<>) (snd p)), (foldr1 (<>) (fst p)))
 maxFun :: Tree Employee -> GuestList
 maxFun = uncurry max . treeFold nextLevel
 
-main = print $ maxFun testCompany
+showResult :: GuestList -> String
+showResult (GL gl f) = "Total fun: " ++ show f ++ "\n" ++ (intercalate "\n" (map empName gl))
+
+main :: IO ()
+main = readFile "company.txt" >>= putStrLn . showResult . maxFun . read
