@@ -27,7 +27,7 @@ textValue (s, _) = getScore s
 
 instance Buffer (JoinList (Score, Size) String) where
   toString l   = intercalate "\n" (jlToList l)
-  fromString s = foldr (+++) Empty (map (\x -> Single (scoreString s, 1) s) (lines s)) --TODO: balanced tree
+  fromString s = foldr (+++) Empty (map (\x -> Single (scoreString x, 1) x) (lines s)) --TODO: balanced tree
   line n b     = indexJ n b
   replaceLine n l b = (takeJ (n - 1) b) +++ (Single (scoreString l, 1) l) +++ (dropJ (n + 1) b)
   numLines     = numOfLines . tag

@@ -48,7 +48,7 @@ nats :: Stream Integer
 nats = streamFromSeed (+1) 0
 
 interleaveStreams :: Stream a -> Stream a -> Stream a
-interleaveStreams (Cons x xs) ~(Cons y ys) = Cons x $ Cons y $ interleaveStreams xs ys
+interleaveStreams (Cons x xs) ys = Cons x $ interleaveStreams ys xs
 
 --nth element in the stream is the largest power of 2 which evenly divides n.
 ruler :: Stream Integer
