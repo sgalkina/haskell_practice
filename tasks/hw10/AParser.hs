@@ -82,12 +82,10 @@ intPair = (\a b c -> [a, c]) <$> posInt <*> char ' ' <*> posInt
 instance Alternative Parser where
   empty = Parser (\_ -> Nothing)
   (<|>) p1 p2 = Parser (\x -> case runParser p1 x of
-                        Nothing -> case runParser p2 x of
-                          Nothing -> Nothing
-                          j -> j
+                        Nothing -> runParser p2 x
                         j -> j)
 
 intOrUppercase :: Parser ()
 intOrUppercase = (\a -> ()) <$> posInt <|> (\a -> ()) <$> (satisfy isUpper)
 
-main = print $ runParser intOrUppercase "foo"
+main = print $ runParser intOrUppercase "JJfoo"
